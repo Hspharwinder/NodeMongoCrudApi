@@ -20,3 +20,7 @@ copy path paste in db.js file like  const uri = 'mongodb://localhost:27124/dbnam
 for graphical view install robo 3t
 
 connectivity in db.js file
+
+incase problem try wtih On Windows, use this command:
+
+> set DEBUG=myapp:* & npm start
