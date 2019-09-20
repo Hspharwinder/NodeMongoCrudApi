@@ -46,14 +46,15 @@ router.put('/put', (req,res)=>{
           doc.email = req.body.email,
           doc.price = req.body.price,
           doc.quantity = req.body.quantity
-          doc.save();
+          doc.save();     
         }
         else
         {
          console.log('Error in retrieving book :' + err)
         }
+             
+        res.json(req.body);
     });
-    res.json({abc: "working"})
 });
 router.post('/post', (req,res)=>{
     var book = add(req,res);
