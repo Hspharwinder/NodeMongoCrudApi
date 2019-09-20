@@ -24,3 +24,12 @@ connectivity in db.js file
 incase problem try wtih On Windows, use this command:
 
 > set DEBUG=myapp:* & npm start
+
+
+use postman
+get -- http://localhost:3000/book/get
+in app.js 
+app.use('/book', bookController);
+
+get -- http://localhost:3000/get
+app.use('/', bookController);
