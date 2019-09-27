@@ -49,7 +49,7 @@ module.exports = app;
 
 
 // var mongoose = require('mongoose');
-// const url = 'mongodb://127.0.0.1:27017/CrudNodeApi';
+// const url = 'mongodb://ip/clectionName';
 // mongoose.connect(url);
 // var db = mongoose.connection;
 
