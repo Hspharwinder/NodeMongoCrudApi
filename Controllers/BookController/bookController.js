@@ -43,9 +43,9 @@ router.put('/put', (req,res)=>{
         if(!err)
         {
           doc.name = req.body.name;
-          doc.email = req.body.email,
-          doc.price = req.body.price,
-          doc.quantity = req.body.quantity
+          doc.email = req.body.email;
+          doc.price = req.body.price;
+          doc.quantity = req.body.quantity;
           doc.save();     
         }
         else
@@ -74,5 +74,26 @@ function add(req,res){
     });
     return book
 }
+
+router.post('/post', (req,res)=>{
+    var book = add(req,res);
+    res.send(book);
+});
+
+function add(req,res){
+    var book = new BookSchema(); 
+    book.name = req.body.name,
+    book.email = req.body.email,
+    book.price = req.body.price,
+    book.quantity = req.body.quantity,
+
+    book.save(function (err, book) {
+        if (err) return console.error(err);
+        console.log(book.name + " saved to bookstore collection.");
+    });
+    return book
+}
+
+
 
 module.exports = router;

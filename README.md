@@ -33,3 +33,9 @@ app.use('/book', bookController);
 
 get -- http://localhost:3000/get
 app.use('/', bookController);
+
+Solve cors error 
+npm install cors
+var cors = require('cors');
+// Then use it before your routes are set up:
+app.use(cors());
