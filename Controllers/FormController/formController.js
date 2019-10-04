@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const FormSchema = mongoose.model('FromData');
 const multer = require('multer');
 var ncp = require('ncp').ncp; // for coping file
+require("dotenv/config");
 
 
 
@@ -78,45 +79,38 @@ router.delete('/delete/:id', (req,res)=>{
     getData(req,res);
 });
 
+let filenameStore;
 var storage = multer.diskStorage({
     destination:(req,file,cb)=>{
         cb(null,'Controllers/FormController/tempFile')
     },
     filename:function(req,file,cb){
-        cb(null, '-' + Date.now() + file.originalname);
+        filenameStore = Date.now() + '_' + file.originalname;
+        cb(null, filenameStore);
     }
   })
 
 var upload = multer({ storage: storage });
-  
+
+let filePath;
 router.post('/filePost', upload.single('File'), function (req, res, next) {
     if (!req.file) {
         console.log("No file received");
         return res.send({
-            fileUploadSucess: false
+            fileUploadSucess: false,            
         });
 
     } else {
-        console.log('file received');        
-        //fileCopy();
-        
+        console.log('file received'); 
+        filePath = 'tempFile/'+ filenameStore;          
         return res.send({
-            fileUploadSucess: true
+            fileUploadSucess: true,
+            filePath: filePath
         })
     }
 });
 
-router.post('/post', (req,res)=>{
-    let res1 = fileCopy(req,res);   
-    let res2 = addRecords(req,res);
-    let response = "res1: " + res1  + "  res2: " + res2;
-    console.log("response" + response);
-    res.send(response);
-    
-});
-
-async function moveFile(req, res){
-    // let source = 'Controllers/FormController/tempFile/-15699376994760.png';
+function moveFile(req, res){
     const fs = require('fs');
     const path = require('path');
     const directory = 'Controllers/FormController/tempFile';
@@ -131,26 +125,49 @@ async function moveFile(req, res){
             });
         }
     });
-    res.send(msg);
 }
 
 function fileCopy(req,res){ 
-    let source = 'Controllers/FormController/tempFile';
-    let destination = 'Controllers/FormController/fileUpload';
-    let msg;
-    ncp(source, destination, function (err) {
-        if (err) {
-            msg = "Error While copying file " + err;
-            console.error(msg);            
-        }
-        else{           
-            msg = "Copy File Done !!";
-            console.log(msg); 
-            moveFile(req,res);         
-        }            
-    });
-    res.send(msg);
+    let msg;    
+
+    if(filePath == req.body.fileUpload){     
+        debugger;   
+        const fs = require('fs');
+        let source = 'Controllers/FormController/tempFile/' + req.body.fileUpload.replace('tempFile/', '');
+        let destination = 'Controllers/FormController/fileUpload/' + req.body.fileUpload.replace('tempFile/', '');
+        // Copy dsingle file of folder
+        fs.copyFile(source, destination, (err) => {
+            if (err) throw err;
+            console.log('source.txt was copied to destination.txt');
+            moveFile(req,res);
+        });
+
+
+       
+            // Copy all file of folder
+          // ncp(source, destination, function (err) {
+        //     if (err) {
+        //         msg = "Error While copying file " + err;
+        //         console.error(msg);            
+        //     }
+        //     else{           
+        //         debugger;
+        //         msg = "Copy File Done !!";
+        //         console.log(msg); 
+        //         moveFile(req,res);         
+        //     }            
+        // });
+    }
 }
+
+
+
+router.post('/post', (req,res)=>{
+    let res1 = fileCopy(req,res);   
+    let res2 = addRecords(req,res);    
+    res.send({res:"Form saved sucess!!"});
+    
+});
 
 
 function addRecords(req,res) {
@@ -164,7 +181,8 @@ function addRecords(req,res) {
     form.hobbies = {...req.body.hobbies},
     form.name = req.body.name
     form.password = req.body.password,
-    form.filePath = 'Controllers/FormController/fileUpload/' + req.body.fileUpload.replace(/^C:\\fakepath\\/i, '');
+    form.filePath = 'Controllers/FormController/fileUpload/' + filenameStore;
+    // req.body.fileUpload.replace(/^C:\\fakepath\\/i, '');
     
     let msg;
     form.save(function (err, form) {
@@ -177,7 +195,7 @@ function addRecords(req,res) {
             msg = " err while saving.";
         }
     });    
-    res.send(msg);
+    
 }
 
 module.exports = router;
